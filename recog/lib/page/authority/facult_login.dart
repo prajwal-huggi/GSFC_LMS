@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:recog/components/taskmanager.dart';
 import 'package:recog/page/bottom_navigation.dart';
+import 'package:recog/service/verify.dart';
 
 class FacultyLogin extends StatefulWidget {
   const FacultyLogin({super.key});
@@ -10,7 +12,18 @@ class FacultyLogin extends StatefulWidget {
 }
 
 class _FacultyLoginState extends State<FacultyLogin> {
+  Logger logger= Logger();
   Future<bool>? _future;
+
+  Future<bool> _callApi(String email, String password) async{
+    logger.i("Email is $email");
+    logger.i("Password is $password");
+    
+    Future<bool> verify= verifyFaculty(context, email, password);
+    await Future.delayed(const Duration(seconds: 3));
+
+    return verify;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,13 +69,13 @@ class _FacultyLoginState extends State<FacultyLogin> {
               width: 300,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const BottomNavigator(),)
-                  );
-                  // setState(() {
-                  //   _future = _callApi(_emailController.text, _passwordController.text);
-                  // });
+                  // Navigator.pushReplacement(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => const BottomNavigator(),)
+                  // );
+                  setState(() {
+                    _future = _callApi(_emailController.text, _passwordController.text);
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,

@@ -11,9 +11,8 @@ import 'package:video_player/video_player.dart';
 import 'package:recog/components/taskmanager.dart';
 
 class Process extends StatefulWidget {
-  final File videoFile;
-  final String videoPath;
-  const Process({super.key, required this.videoPath, required this.videoFile});
+  final String videoFile;
+  const Process({super.key, required this.videoFile});
 
   @override
   State<Process> createState() => _ProcessState();
@@ -36,6 +35,7 @@ class _ProcessState extends State<Process> {
   @override
   void initState() {
     super.initState();
+    logger.i("URL of the video file is ${widget.videoFile}");
     initializeVideoPlayer();
     // transcribeText= transcribe(widget.videoFile);
     translateText= transcribeText;
@@ -53,17 +53,14 @@ class _ProcessState extends State<Process> {
     //   });
     
     CachedVideoPlayerController _cachedVideoPlayerController;
-    _cachedVideoPlayerController= CachedVideoPlayerController.file(widget.videoFile)
+    // _cachedVideoPlayerController= CachedVideoPlayerController.file(widget.videoFile)
+    _cachedVideoPlayerController= CachedVideoPlayerController.network(widget.videoFile)
     ..initialize().then((value){
       setState((){});
     });
 
     _customVideoPlayerController= CustomVideoPlayerController(context: context, videoPlayerController: _cachedVideoPlayerController);
     // _customVideoPlayerController= CustomVideoPlayerController(context: context, videoPlayerController: _videoPlayerController);
-  }
-
-  Text getTranscription(){
-    return Text("Transcription will be showed with the help of backend");
   }
 
   Text getQna(){
@@ -110,7 +107,21 @@ class _ProcessState extends State<Process> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecorator.boxdecorator,
-              child: getTranscription(),
+              // child: const Text("HELLO"),
+              child: FutureBuilder(
+                future: transcribeText,
+                builder: (context, snapshot){
+                  if(snapshot.connectionState== ConnectionState.waiting){
+                    return const Center(child: CircularProgressIndicator(),);
+                  }else if(snapshot.hasError){
+                    return Text("Error ${snapshot.error}");
+                  }else if(snapshot.hasData){
+                    return Text(snapshot.data.toString());
+                  }
+
+                  return const Text("No data found");
+                },
+              ),
             ),
             const SizedBox(height: 15),
         
@@ -167,10 +178,6 @@ class _ProcessState extends State<Process> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecorator.boxdecorator,
-              child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecorator.boxdecorator,
-              // child: Text(translateText.toString()),
               child: FutureBuilder(future: summarizeText, 
               builder: (context, snapshot){
                 if(snapshot.connectionState== ConnectionState.waiting){
@@ -184,8 +191,7 @@ class _ProcessState extends State<Process> {
                 }else{
                   return const Text("No data found");}
               },
-              )
-            ),
+              ),
             ),
             //Just for testing
             // ElevatedButton(onPressed: (){logger.i(_selectedLanguage);}, child: const Text("JKHLKJHL:K"),),

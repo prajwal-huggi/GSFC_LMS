@@ -61,7 +61,11 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:recog/components/box_decorator.dart';
+import 'package:recog/page/process.dart';
 import 'package:recog/page/video_player_screen.dart';
+import 'package:recog/service/get_all_videos.dart';
+import 'package:recog/service/get_particular_lectures.dart';
 
 class VideoList extends StatefulWidget {
   const VideoList({super.key});
@@ -71,33 +75,110 @@ class VideoList extends StatefulWidget {
 }
 
 class _VideoListState extends State<VideoList> {
-  final List<Map<String, String>> videos=[
-    {
-      'title': 'Video 1',
-      'url': 'https://youtu.be/yvwoDRNuA7Q?feature=shared'
-    },
-    {
-      'title': 'Video 2',
-      'url': 'https://youtu.be/aLx2q-UnH6M?si=8-97tUnBN0yaWPYP'
-    }
+  late Future<List<dynamic>> _allData;
+  
+  final List<String> _dropDownItems= [
+    "OS", "COA", "DSA", "DBMS", "CN"
   ];
+  String? _selectedSubject; 
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _allData= getAllVideoLectures();
+    super.initState();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.builder(
-        itemCount: videos.length,
-        itemBuilder:(context, index){
-          return ListTile(
-            title: Text(videos[index]['title']!),
-            onTap: (){
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context)=> VideoPlayerScreen(
-                  videoUrl: videos[index]['url']!,
+      appBar: AppBar(title: const Text("List of videos")),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            //Dropdown menu
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: BorderRadius.circular(2),
                 ),
-              ),);
-            },
-          );
-        }
+                child: DropdownButton<String>(
+                      value: _selectedSubject,
+                      hint: const Text("Select Subject"),
+                      onChanged: (String? value){
+                        setState((){
+                _selectedSubject= value;
+                _allData= getParticularLectures(_selectedSubject);
+                        });
+                      },
+                      items: _dropDownItems.map<DropdownMenuItem<String>>((String value){
+                        return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+                        );
+                      }).toList(),
+                    ),
+              ),
+            ),
+            //Horizontal line for differentiating
+            const Divider(
+              thickness: 1,
+            ),
+            //Listview for videos
+            FutureBuilder(
+              future: _allData, 
+              builder: (context, snapshot){
+                if(snapshot.connectionState== ConnectionState.waiting){
+                  return const CircularProgressIndicator();
+                }else if(snapshot.hasError){
+                  return const Text("Unexpected Error occurred");
+                }else if(snapshot.hasData){
+                  final items= snapshot.data!;
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: items.length,
+                      itemBuilder: (context, index){
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecorator.boxdecorator,
+                            child: ListTile(
+                              title: Text(items[index]['title']),
+                              onTap: (){
+                                Navigator.push(context, MaterialPageRoute(
+                                  builder:(context)=> Process(videoFile:items[index]['video_url']),
+                                ));
+                              },
+                            ),
+                          ),
+                        );
+                      }),
+                  );
+                }
+                return const Text("No data found");
+              })
+            // Expanded(
+            //   child: ListView.builder(
+            //     itemCount: videos.length,
+            //     itemBuilder:(context, index){
+            //       return ListTile(
+            //         title: Text(videos[index]['title']!),
+            //         onTap: (){
+            //           Navigator.push(context, MaterialPageRoute(
+            //             builder: (context)=> VideoPlayerScreen(
+            //               videoUrl: videos[index]['url']!,
+            //             ),
+            //           ),);
+            //         },
+            //       );
+            //     }
+            //   ),
+            // ),
+          ],
+        ),
       ),
     );
   }
