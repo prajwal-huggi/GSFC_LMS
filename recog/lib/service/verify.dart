@@ -34,3 +34,31 @@ Future<bool> verifyFaculty(BuildContext context, String email, String password) 
     return false;
   }
 }
+
+Future<bool> verifyStudent(BuildContext, String email, String password) async{
+  try{
+    logger.i("Student email: $email \n Password: $password");
+    final url= Uri.parse("http://127.0.0.1:5000/verifyStudent");
+
+    var dict={
+      'studentEmail': email,
+      'studentPassword': password,
+    };
+
+    var response= await http.post(url, body: jsonEncode(dict), headers: {'Content-Type': 'application/json'});
+
+    if(response.statusCode== 200){
+      bool data= jsonDecode(response.body);
+      if(data) logger.i("Student is verified");
+      else logger.i("Student is not exist or password is incorrect");
+
+      return data;
+    }else{
+      logger.e("verifyStudent else error");
+      return false;
+    }
+  }catch(error){
+    logger.e("Catch error: $error");
+    return false;
+  }
+}

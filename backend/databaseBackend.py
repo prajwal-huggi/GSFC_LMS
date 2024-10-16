@@ -250,19 +250,50 @@ def verifyProfessor():
     if facultyData:
         #Verify the password
         for key, faculty in facultyData.items():
-                if faculty.get('password') == facultyPassword:
-                    print("user verified")
-                    return jsonify(True)
-                else :
-                    print("User password not matched")
-                    return jsonify(False)
+            if faculty.get('password') == facultyPassword:
+                print("user verified")
+                return jsonify(True)
+            else :
+                print("User password not matched")                        
+                return jsonify(False)
     
     print("User not present")
     return jsonify(False)
+
+#Verifying the Student
+@app.route('/verifyStudent', methods=['POST'])
+def verifyStudent():
+    try:
+        request_data = request.data
+        print("Entered")
+        request_data = json.loads(request_data.decode('utf-8'))
+        print("decoded")
+        studentEmail = request_data['studentEmail']
+        studentPassword = request_data['studentPassword']
+
+        studentData = database.child("Student").order_by_child("email").equal_to(studentEmail).get().val()
+
+        if studentData:
+            # Verify the password
+            for key, student in studentData.items():
+                if student.get('password') == studentPassword:
+                    print("user verified")
+                    return jsonify(True)
+                else:
+                    print("User password not matched")
+                    return jsonify(False)
+
+        print("User not present")
+        return jsonify(False)
+    
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return jsonify({"error": "An error occurred while verifying the student. Please try again later."}), 500
+
     
 #Adding the faculty
 @app.route('/addFaculty', methods= ['POST'])
-def add():
+def addFaculty():
     email= 'xyz@gmail.com'
     password= '12345'
 
@@ -273,6 +304,21 @@ def add():
     database.child("Faculty").push(metadata)
     
     return 'Successfully Added the faculty credentials'
+
+#Adding the student
+@app.route('/addStudent', methods=['POST'])
+def addStudent():
+    email= 'prajwal@gmail.com'
+    password= '123456'
+
+    metadata={
+        'email': email,
+        'password': password
+    }
+
+    database.child("Student").push(metadata)
+    return "The student is added successfully"
+
 
 @app.route('/')
 def check():

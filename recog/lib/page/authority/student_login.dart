@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:recog/components/taskmanager.dart';
 import 'package:recog/page/bottom_navigation.dart';
 import 'package:recog/page/video_list.dart';
+import 'package:recog/service/verify.dart';
 
 class StudentLogin extends StatefulWidget {
   const StudentLogin({super.key});
@@ -12,6 +13,13 @@ class StudentLogin extends StatefulWidget {
 
 class _StudentLoginState extends State<StudentLogin> {
   Future<bool>? _future;
+
+  Future<bool> _callApi(String email, String password) async{
+    Future<bool> verify= verifyStudent(BuildContext, email, password);
+    await Future.delayed(const Duration(seconds: 3));
+
+    return verify;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,13 +65,9 @@ class _StudentLoginState extends State<StudentLogin> {
               width: 300,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const VideoList(),)
-                  );
-                  // setState(() {
-                  //   _future = _callApi(_emailController.text, _passwordController.text);
-                  // });
+                  setState(() {
+                    _future = _callApi(_emailController.text, _passwordController.text);
+                  });
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
@@ -89,7 +93,7 @@ class _StudentLoginState extends State<StudentLogin> {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => const BottomNavigator()),
+                        MaterialPageRoute(builder: (context) => const VideoList()),
                       );
                     });
                     return Container(); // Empty container as placeholder

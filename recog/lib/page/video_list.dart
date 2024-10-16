@@ -61,6 +61,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:recog/components/box_decorator.dart';
 import 'package:recog/page/process.dart';
 import 'package:recog/page/video_player_screen.dart';
@@ -137,6 +138,9 @@ class _VideoListState extends State<VideoList> {
                   return const Text("Unexpected Error occurred");
                 }else if(snapshot.hasData){
                   final items= snapshot.data!;
+                  if(items.isEmpty){
+                    return const Expanded(child: Center(child: Text("No lectures uploaded")));
+                  }
                   return Expanded(
                     child: ListView.builder(
                       itemCount: items.length,
@@ -158,7 +162,9 @@ class _VideoListState extends State<VideoList> {
                       }),
                   );
                 }
-                return const Text("No data found");
+                else{
+                  return const Center(child: Text("No lectures uploaded"));
+                }
               })
             // Expanded(
             //   child: ListView.builder(
