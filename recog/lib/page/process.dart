@@ -34,6 +34,9 @@ class _ProcessState extends State<Process> {
 
   @override
   void initState() {
+    // transcribe(widget.videoFile);
+    // logger.i("Init State is invoked and the url of the video is ${widget.videoFile}");
+    transcribeText= transcribe('/Users/prajwal/Downloads/shortVideo.mp4');
     super.initState();
     logger.i("URL of the video file is ${widget.videoFile}");
     initializeVideoPlayer();
@@ -64,7 +67,7 @@ class _ProcessState extends State<Process> {
   }
 
   Text getQna(){
-    return Text("QnA will be returned to user");
+    return const Text("QnA will be returned to user");
   }
 
 //Dropdown Button for all the possible languages
@@ -96,6 +99,7 @@ class _ProcessState extends State<Process> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView(
+          padding: const EdgeInsets.all(8),
           children: [
             //video player
             CustomVideoPlayer(customVideoPlayerController: _customVideoPlayerController),
@@ -163,14 +167,14 @@ class _ProcessState extends State<Process> {
             const SizedBox(height: 15),
         
             // Text('qna'),
-            const Text("Probable QnA"),
-            const SizedBox(height: 15),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecorator.boxdecorator,
-              child: getQna(),
-            ),
-            const SizedBox(height: 15),
+            // const Text("Probable QnA"),
+            // const SizedBox(height: 15),
+            // Container(
+            //   padding: const EdgeInsets.all(10),
+            //   decoration: BoxDecorator.boxdecorator,
+            //   child: getQna(),
+            // ),
+            // const SizedBox(height: 15),
         
             // Text('Summary')
             const Text("Summary"),

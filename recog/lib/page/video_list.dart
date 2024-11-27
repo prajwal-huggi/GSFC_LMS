@@ -62,6 +62,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/route_manager.dart';
 import 'package:recog/components/box_decorator.dart';
 import 'package:recog/page/process.dart';
 import 'package:recog/page/video_player_screen.dart';
@@ -93,7 +94,15 @@ class _VideoListState extends State<VideoList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("List of videos")),
+      appBar: AppBar(
+        title: const Text("List of videos"),
+        actions:[
+          IconButton(
+            icon:const Icon(Icons.refresh_outlined),
+          onPressed:(){
+            setState(() {});
+          }, ),]),
+        
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
