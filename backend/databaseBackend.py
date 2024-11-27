@@ -139,8 +139,6 @@
 
 # # from collections.abc import MutableMapping
 from flask import Flask, json, request, jsonify
-import time
-import threading
 import pyrebase
 
 
